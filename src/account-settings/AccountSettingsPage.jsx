@@ -29,6 +29,7 @@ import {
 import { accountSettingsPageSelector } from './data/selectors';
 import PageLoading from './PageLoading';
 import JumpNav from './JumpNav';
+import DeleteAccount from './delete-account';
 import EditableField from './EditableField';
 import EditableSelectField from './EditableSelectField';
 import ResetPassword from './reset-password';
@@ -69,6 +70,7 @@ class AccountSettingsPage extends React.Component {
       '#notifications': React.createRef(),
       '#site-preferences': React.createRef(),
       '#linked-accounts': React.createRef(),
+      '#delete-account': React.createRef(),
     };
   }
 
@@ -155,6 +157,11 @@ class AccountSettingsPage extends React.Component {
       label: key === '' ? this.props.intl.formatMessage(messages['account.settings.field.work.experience.options.empty']) : key,
     })),
   }));
+
+  canDeleteAccount = () => {
+    const { committedValues } = this.props;
+    return !getConfig().COUNTRIES_WITH_DELETE_ACCOUNT_DISABLED.includes(committedValues.country);
+  };
 
   removeDisabledCountries = (countryList) => {
     const { countriesCodesList, committedValues } = this.props;
@@ -807,6 +814,16 @@ class AccountSettingsPage extends React.Component {
           </p>
           <ThirdPartyAuth />
         </div>
+
+        {getConfig().ENABLE_ACCOUNT_DELETION && (
+          <div className="account-section pt-3 mb-5" id="delete-account" ref={this.navLinkRefs['#delete-account']}>
+            <DeleteAccount
+              isVerifiedAccount={this.props.isActive}
+              hasLinkedTPA={hasLinkedTPA}
+              canDeleteAccount={this.canDeleteAccount()}
+            />
+          </div>
+        )}
       </>
     );
   }
